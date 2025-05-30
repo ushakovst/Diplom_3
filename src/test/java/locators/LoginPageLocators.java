@@ -10,6 +10,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
+import static org.junit.Assert.assertTrue;
+
 public class LoginPageLocators {
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -27,34 +29,18 @@ public class LoginPageLocators {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-    @Step("Логин пользователя: email")
-    public void enterEmail(String email) {
-        driver.findElement(emailLoginField).sendKeys(email);
-    }
-
-    @Step("Логин пользователя: пароль")
-    public void enterPassword(String password) {
-        driver.findElement(passwordLoginField).sendKeys(password);
-    }
-
-    @Step("Клик по кнопке 'Войти'")
-    public void clickLoginButton() {
-        driver.findElement(loginButton).click();
-    }
-
     @Step("Переход на страницу регистрации")
     public void clickRegistration() {
-        driver.findElement(registrationButton).click();
+        wait.until(ExpectedConditions.elementToBeClickable(registrationButton)).click();
     }
 
     @Step("Открыта ли страница логина")
     public boolean isPageOpened() {
         try {
-            return new WebDriverWait(driver, Duration.ofSeconds(5))
-                    .until(ExpectedConditions.and(
-                            ExpectedConditions.urlContains("/login"),
-                            ExpectedConditions.visibilityOfElementLocated(loginButton)
-                    ));
+            return wait.until(ExpectedConditions.and(
+                    ExpectedConditions.urlContains("/login"),
+                    ExpectedConditions.visibilityOfElementLocated(loginButton)
+            )) != null;
         } catch (TimeoutException e) {
             return false;
         }
@@ -62,32 +48,28 @@ public class LoginPageLocators {
 
     @Step("Ожидание перехода на страницу логина")
     public void waitLoginPage(){
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         wait.until(ExpectedConditions.urlContains("/login"));
     }
 
-    @Step("Ожидание появления поля Email")
-    public WebElement waitForEmailField() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(emailLoginField));
+    @Step("Авторизация зарегестрированного пользователя")
+    public void login(String email, String password) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(emailLoginField)).sendKeys(email);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(passwordLoginField)).sendKeys(password);
+        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
     }
 
-    @Step("Ожидание появления поля Password")
-    public WebElement waitForPasswordField() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(passwordLoginField));
+    @Step("Клик по кнопке регистрации")
+    public void clickRegistrationButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(registrationButton)).click();
     }
 
-    @Step("Ожидание появления кнопки 'Войти'")
-    public WebElement waitForSubmitButton() {
-        return wait.until(ExpectedConditions.elementToBeClickable(loginButton));
+    @Step("Клик по кнопке восстановление пароля")
+    public void clickRecoverButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(recoverPasswordButton)).click();
     }
 
-    @Step("Ожидание появления кнопки 'Зарегестрироваться'")
-    public WebElement waitForRegistrationButton() {
-        return wait.until(ExpectedConditions.elementToBeClickable(registrationButton));
-    }
-
-    @Step("Ожидание появления кнопки 'Восстановить пароль'")
-    public WebElement waitForRecoverButton() {
-        return wait.until(ExpectedConditions.elementToBeClickable(recoverPasswordButton));
+    @Step("Проверка страницы логина")
+    public void checkLoginPage() {
+        assertTrue("Должны быть перенаправлены на страницу логина", isPageOpened());
     }
 }

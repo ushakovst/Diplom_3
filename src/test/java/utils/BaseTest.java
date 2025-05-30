@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import models.UserData;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -19,13 +20,19 @@ public class BaseTest {
     protected final String url = "https://stellarburgers.nomoreparties.site/";
 
     @Before
-    public void setUp() throws Exception {
-        driver = BrowserFactory.createDriver("chrome"); //или "yandex", или "chrome"
+    public void browserSelect() throws Exception {
+        String browser = System.getProperty("browser", "chrome"); //или "yandex", или "chrome"
+        System.out.println("Starting tests in: " + browser.toUpperCase());
+
+        driver = BrowserFactory.createDriver(browser);
 
         wait = new WebDriverWait(driver, Duration.ofSeconds(5)); // Явное ожидание
         driver.manage().window().maximize();
         driver.get(url);
+    }
 
+    @Before
+    public void setUp() throws Exception {
         // cоздание тестового пользователя через API
         testUser = UserGenerator.generateRandomUser();
         Response response = ApiClient.createUser(testUser);

@@ -21,8 +21,8 @@ public class ForgotPasswordPageLocators {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(5));
     }
 
-    @Step("Ожидание появления кнопки 'Войти'")
-    public WebElement waitForLoginLink() {
-        return wait.until(ExpectedConditions.elementToBeClickable(loginButton));
+    @Step("Клик по кнопке Войти")
+    public void clickLoginButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
     }
 }

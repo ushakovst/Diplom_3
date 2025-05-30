@@ -9,6 +9,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
+import static org.junit.Assert.*;
+
 public class HomePageLocators {
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -25,8 +27,7 @@ public class HomePageLocators {
 
     @Step("Клик по кнопке 'Войти в аккаунт'")
     public void clickLoginButton() {
-        wait.until(ExpectedConditions.elementToBeClickable(loginButton))
-                .click();
+        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
     }
 
     @Step("Ожидание успешной авторизации")
@@ -36,27 +37,33 @@ public class HomePageLocators {
 
     @Step("Переход в личный кабинет")
     public void clickPersonalAccountButton() {
-        wait.until(ExpectedConditions.elementToBeClickable(personalAccountButton));
-        driver.findElement(personalAccountButton).click();
+        wait.until(ExpectedConditions.elementToBeClickable(personalAccountButton)).click();
     }
 
     @Step("Проверка отображения главной страницы")
-    public boolean isMainPageDisplayed(String url) {
+    public boolean isHomePageDisplayed(String url) {
         return driver.getCurrentUrl().equals(url);
     }
 
-    @Step("Ожидание появления кнопки 'Войти в аккаунт'")
-    public WebElement waitForLoginButton() {
-        return wait.until(ExpectedConditions.elementToBeClickable(loginButton));
+    @Step("Проверка отображения кнопки 'Войти в аккаунт'")
+    public void verifyLoginButtonVisible() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(loginButton)).getText();
     }
 
-    @Step("Ожидание появления кнопки 'Личный Кабинет'")
-    public WebElement waitForPersonalAccountButton() {
-        return wait.until(ExpectedConditions.elementToBeClickable(personalAccountButton));
+    @Step("Проверка отображения кнопки 'Оформить заказ'")
+    public void verifyOrderButtonVisible() {
+        String actualText = wait.until(ExpectedConditions.visibilityOfElementLocated(placeAnOrder)).getText();
+        assertEquals("Неверный текст кнопки", "Оформить заказ", actualText);
     }
 
-    @Step("Ожидание появления кнопки 'Оформить заказ'")
-    public WebElement waitForOrderButton() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(placeAnOrder));
+    @Step("Проверка отображения кнопки 'Личный кабинет'")
+    public void verifyPersonalAccountButtonVisible() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(personalAccountButton)).getText();
+    }
+
+    @Step("Проверка страницы профиля")
+    public void checkHomePage(String url) {
+        assertTrue("Должны вернуться на главную страницу",
+                isHomePageDisplayed(url));
     }
 }

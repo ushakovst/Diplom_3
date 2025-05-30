@@ -3,11 +3,15 @@ package locators;
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.TimeoutException;
 
 import java.time.Duration;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ProfilePageLocators {
     private final WebDriver driver;
@@ -30,12 +34,12 @@ public class ProfilePageLocators {
 
     @Step("Переход в конструктор через ссылку")
     public void clickConstructorLink() {
-        driver.findElement(constructorLink).click();
+        wait.until(ExpectedConditions.elementToBeClickable(constructorLink)).click();
     }
 
     @Step("Переход в конструктор через логотип")
     public void clickConstructorLogo() {
-        driver.findElement(logo).click();
+        wait.until(ExpectedConditions.elementToBeClickable(logo)).click();
     }
 
 
@@ -46,5 +50,18 @@ public class ProfilePageLocators {
         } catch (TimeoutException e) {
             return false;
         }
+    }
+
+    @Step("Проверка невозможности доступа к странице профиля")
+    public void checkProfilePageOut() {
+        driver.navigate().back();
+        assertFalse("Не должны иметь доступа к профилю после выхода",
+                isPageOpened());
+    }
+
+    @Step("Проверка страницы профиля")
+    public void checkProfilePage() {
+        assertTrue("Страница профиля не открылась",
+                isPageOpened());
     }
 }

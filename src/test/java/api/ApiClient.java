@@ -15,7 +15,7 @@ public class ApiClient {
         return given()
                 .baseUri(BASE_URL)
                 .contentType("application/json")
-                .body(gson.toJson(user))
+                .body(user)
                 .post("/auth/register");
     }
 

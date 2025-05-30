@@ -50,6 +50,11 @@
 mvn clean compile
 mvn clean test
 ```
+По умолчанию будут запускаться тесты в Chrome:
+```bash
+mvn test -Dbrowser=chrome
+mvn test -Dbrowser=yandex
+```
 
 ## Для создания отчета в Allure
 ```bash

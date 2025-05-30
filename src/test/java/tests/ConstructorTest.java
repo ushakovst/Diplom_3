@@ -1,7 +1,9 @@
 package tests;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Story;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -9,7 +11,6 @@ import locators.ConstructorPageLocators;
 import utils.BaseTest;
 import java.util.Arrays;
 import java.util.Collection;
-import static org.junit.Assert.assertTrue;
 
 @Epic("Конструктор бургеров")
 @RunWith(Parameterized.class)
@@ -20,7 +21,7 @@ public class ConstructorTest extends BaseTest {
         this.sectionName = sectionName;
     }
 
-    @Parameterized.Parameters(name = "Проверка раздела")
+    @Parameterized.Parameters(name = "Тестовые данные: sectionName={0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"Булки"},
@@ -31,6 +32,8 @@ public class ConstructorTest extends BaseTest {
 
     @Test
     @Story("Навигация по разделам конструктора")
+    @DisplayName("Проверка работы перехода по разделам")
+    @Description("Проверка навигации по разделам конструктора")
     public void testSectionActivation() {
         ConstructorPageLocators constructorPage = new ConstructorPageLocators(driver);
 
@@ -42,7 +45,7 @@ public class ConstructorTest extends BaseTest {
             constructorPage.selectSection(sectionName);
         }
 
-        assertTrue("Раздел " + sectionName + " должен быть активен",
-                constructorPage.isSectionActive(sectionName));
+        //проверка активности секции
+        constructorPage.checkSectionActive(sectionName);
     }
 }

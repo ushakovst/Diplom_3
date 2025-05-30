@@ -2,21 +2,15 @@ package tests;
 
 import io.qameta.allure.Epic;
 import io.qameta.allure.*;
+import io.qameta.allure.junit4.DisplayName;
 import models.UserData;
 import locators.HomePageLocators;
 import locators.LoginPageLocators;
 import locators.RegistrationPageLocators;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.BaseTest;
-import utils.BrowserFactory;
 import utils.UserGenerator;
-
-import java.time.Duration;
-
-import static org.junit.Assert.*;
 
 @Epic("Регистрация пользователя")
 public class RegistrationTest extends BaseTest {
@@ -24,62 +18,45 @@ public class RegistrationTest extends BaseTest {
     @Override
     @Before
     public void setUp() throws Exception {
-        // Инициализация драйвера
-        driver = BrowserFactory.createDriver("chrome");
-        driver.manage().window().maximize();
-        driver.get(url);
     }
 
     @Test
     @Story("Успешная регистрация")
-    @Step("Регистрация с валидными данными")
+    @DisplayName("Регистрация с валидными данными")
+    @Description("Проверка регистрации нового пользователя с корректными данными")
     public void testSuccessfulRegistration() {
         HomePageLocators homePage = new HomePageLocators(driver);
+        LoginPageLocators loginPage = new LoginPageLocators(driver);
+        RegistrationPageLocators registrationPage = new RegistrationPageLocators(driver);
+
         homePage.clickLoginButton();
 
-        LoginPageLocators loginPage = new LoginPageLocators(driver);
         loginPage.clickRegistration();
 
-        RegistrationPageLocators registrationPage = new RegistrationPageLocators(driver);
+        // регистрация нового пользователя
         UserData newUser = UserGenerator.generateRandomUser();
+        registrationPage.registration(newUser.getName(), newUser.getEmail(), newUser.getPassword());
 
-        registrationPage.enterRegisterName(newUser.getName());
-        registrationPage.enterRegisterEmail(newUser.getEmail());
-        registrationPage.enterRegisterPassword(newUser.getPassword());
-
-        registrationPage.clickRegisterButton();
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(ExpectedConditions.urlContains("/login"));
-
-        assertTrue("Должны быть перенаправлены на страницу логина",
-                loginPage.isPageOpened());
+        // должны быть перенаправлены на страницу логина
+        loginPage.checkLoginPage();
     }
 
     @Test
     @Story("Валидация пароля")
-    @Step("Регистрация с коротким паролем (5 символов)")
+    @DisplayName("Регистрация с коротким паролем (5 символов)")
+    @Description("Получение ошибки при попытке регистрации нового пользователя с коротким паролем (5 символов)")
     public void testRegistrationWithShortPassword() {
-        HomePageLocators mainPage = new HomePageLocators(driver);
-        mainPage.clickLoginButton();
-
+        HomePageLocators homePage = new HomePageLocators(driver);
         LoginPageLocators loginPage = new LoginPageLocators(driver);
+        RegistrationPageLocators registrationPage = new RegistrationPageLocators(driver);
+
+        homePage.clickLoginButton();
+
         loginPage.clickRegistration();
 
-        RegistrationPageLocators registrationPage = new RegistrationPageLocators(driver);
         UserData invalidUser = UserGenerator.generateUserWithIncorrectPass();
+        registrationPage.registration(invalidUser.getName(), invalidUser.getEmail(), invalidUser.getPassword());
 
-        registrationPage.enterRegisterName(invalidUser.getName());
-        registrationPage.enterRegisterEmail(invalidUser.getEmail());
-        registrationPage.enterRegisterPassword(invalidUser.getPassword());
-
-        registrationPage.clickRegisterButton();
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                registrationPage.getPasswordErrorLocator()));
-
-        assertTrue("Должна отображаться ошибка пароля",
-                registrationPage.isPasswordErrorDisplayed());
+        registrationPage.checkError();
     }
 }

@@ -6,6 +6,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
+import static org.junit.Assert.assertTrue;
+
 public class ConstructorPageLocators {
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -42,13 +44,11 @@ public class ConstructorPageLocators {
     }
 
     @Step("Проверка активности селектора")
-    public boolean isSectionActive(String sectionName) {
-        try{
-            By locator = getSectionLocator(sectionName); // метод для получения локатора
-            WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-            return element.getAttribute("class").contains("current");
-        } catch (Exception e) {
-            return false;
-            }
-        }
+    public void checkSectionActive(String sectionName) {
+        By locator = getSectionLocator(sectionName);
+        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+
+        assertTrue("Раздел " + sectionName + " должен быть активен",
+                element.getAttribute("class").contains("current"));
+    }
 }

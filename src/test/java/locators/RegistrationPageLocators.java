@@ -2,12 +2,15 @@ package locators;
 
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+
+import static org.junit.Assert.assertTrue;
 
 public class RegistrationPageLocators {
     private final WebDriver driver;
@@ -26,40 +29,32 @@ public class RegistrationPageLocators {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(5));
     }
 
-    @Step("Регистрация пользователя: name")
-    public void enterRegisterName(String name) {
-        driver.findElement(nameRegisterField).sendKeys(name);
+    @Step("Клик по кнопке Войти")
+    public void clickLoginButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
     }
 
-    @Step("Регистрация пользователя: email")
-    public void enterRegisterEmail(String email) {
-        driver.findElement(emailRegisterField).sendKeys(email);
+    @Step("Ожидание появления ошибки")
+    public boolean isErrorDisplayed() {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(passwordRegisterError));
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
-    @Step("Регистрация пользователя: password")
-    public void enterRegisterPassword(String password) {
-        driver.findElement(passwordRegisterField).sendKeys(password);
-    }
-
-    @Step("Клик по кнопке регистрации")
-    public void clickRegisterButton() {
-        driver.findElement(registerButton).click();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    @Step("Регистрация нового пользователя")
+    public void registration(String name, String email, String password) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(nameRegisterField)).sendKeys(name);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(emailRegisterField)).sendKeys(email);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(passwordRegisterField)).sendKeys(password);
         wait.until(ExpectedConditions.elementToBeClickable(registerButton)).click();
     }
 
-    @Step("Проверка ошибки пароля")
-    public boolean isPasswordErrorDisplayed() {
-        return driver.findElement(passwordRegisterError).isDisplayed();
-    }
-
-    @Step("Геттер ошибки")
-    public By getPasswordErrorLocator() {
-        return passwordRegisterError;
-    }
-
-    @Step("Ожидание появления кнопки 'Войти'")
-    public WebElement waitForLoginLink() {
-        return wait.until(ExpectedConditions.elementToBeClickable(loginButton));
+    @Step("Проверка появления ошибки при регистрации")
+    public void checkError() {
+        assertTrue("Должна отображаться ошибка пароля",
+                isErrorDisplayed());
     }
 }

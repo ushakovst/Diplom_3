@@ -1,9 +1,11 @@
 package tests;
 
 import api.ApiClient;
+import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Step;
 import io.qameta.allure.Story;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import locators.LoginPageLocators;
 import models.UserData;
@@ -23,11 +25,6 @@ public class NavigationTest extends BaseTest {
     @Override
     @Before
     public void setUp() throws Exception {
-        // инициализация драйвера
-        driver = BrowserFactory.createDriver("chrome");
-        driver.manage().window().maximize();
-        driver.get(url);
-
         // создание пользователя через API
         UserData testUser = UserGenerator.generateRandomUser();
         Response response = ApiClient.createUser(testUser);
@@ -35,11 +32,8 @@ public class NavigationTest extends BaseTest {
         // авторизация
         HomePageLocators homePage = new HomePageLocators(driver);
         homePage.clickLoginButton();
-
         LoginPageLocators loginPage = new LoginPageLocators(driver);
-        loginPage.enterEmail(testUser.getEmail());
-        loginPage.enterPassword(testUser.getPassword());
-        loginPage.clickLoginButton();
+        loginPage.login(testUser.getEmail(), testUser.getPassword());
 
         // ожидание успешной авторизации
         homePage.waitForUrlsContains(url);
@@ -47,42 +41,47 @@ public class NavigationTest extends BaseTest {
 
     @Test
     @Story("Личный кабинет")
-    @Step("Переход в личный кабинет авторизованного пользователя")
+    @DisplayName("Переход в личный кабинет авторизованного пользователя")
+    @Description("Проверка перехода авторизованного пользователя в личный кабинет по кнопке 'Личный Кабинет'")
     public void testNavigateToPersonalAccount() {
         HomePageLocators homePage = new HomePageLocators(driver);
         ProfilePageLocators profilePage = new ProfilePageLocators(driver);
 
         homePage.clickPersonalAccountButton();
 
-        assertTrue("Страница профиля не открылась",
-                profilePage.isPageOpened());
+        //проверка страницы профиля
+        profilePage.checkProfilePage();
     }
 
     @Test
     @Story("Конструктор")
-    @Step("Возврат в конструктор из личного кабинета")
+    @DisplayName("Возврат в конструктор из личного кабинета")
+    @Description("Проверка перехода на главную страницу из личного кабинета при нажатии кнопки 'Конструктор'")
     public void testNavigateBackToConstructor() {
         HomePageLocators homePage = new HomePageLocators(driver);
+        ProfilePageLocators profilePage = new ProfilePageLocators(driver);
+
         homePage.clickPersonalAccountButton();
 
-        ProfilePageLocators profilePage = new ProfilePageLocators(driver);
         profilePage.clickConstructorLink();
 
-        assertTrue("Должны вернуться на главную страницу",
-                homePage.isMainPageDisplayed(url));
+        //проверка домашней страницы
+        homePage.checkHomePage(url);
     }
 
     @Test
     @Story("Логотип")
-    @Step("Возврат через логотип из личного кабинета")
+    @DisplayName("Возврат через логотип из личного кабинета")
+    @Description("Проверка перехода на главную страницу из личного кабинетапри нажатии на лого")
     public void testNavigateViaLogo() {
         HomePageLocators homePage = new HomePageLocators(driver);
+        ProfilePageLocators profilePage = new ProfilePageLocators(driver);
+
         homePage.clickPersonalAccountButton();
 
-        ProfilePageLocators profilePage = new ProfilePageLocators(driver);
         profilePage.clickConstructorLogo();
 
-        assertTrue("Должны вернуться на главную страницу",
-                homePage.isMainPageDisplayed(url));
+        //должны вернуться на главную страницу
+        homePage.checkHomePage(url);
     }
 }

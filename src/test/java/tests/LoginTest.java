@@ -1,133 +1,108 @@
 package tests;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Story;
-import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Test;
 import locators.*;
-import org.openqa.selenium.WebElement;
 import utils.BaseTest;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @Epic("Авторизация пользователя")
 public class LoginTest extends BaseTest {
 
     @Test
     @Story("Основной сценарий")
-    @Step("Вход через кнопку 'Войти в аккаунт'")
+    @DisplayName("Вход через кнопку 'Войти в аккаунт'")
+    @Description("Проверка авторизации пользователя через кнопку 'Войти в аккаунт'")
     public void testLoginViaMainButton() {
         HomePageLocators homePage = new HomePageLocators(driver);
         LoginPageLocators loginPage = new LoginPageLocators(driver);
 
         // исходное состояние - кнопка "Войти в аккаунт"
-        WebElement loginButton = homePage.waitForLoginButton();
-        assertTrue("Кнопка входа не отображается", loginButton.isDisplayed());
-        assertEquals("Неверный текст кнопки до авторизации",
-                "Войти в аккаунт", loginButton.getText());
+        homePage.verifyLoginButtonVisible();
 
         // переход на страницу авторизации
-        loginButton.click();
+        homePage.clickLoginButton();
 
         // заполнение данных и отправка формы
-        loginPage.waitForEmailField().sendKeys(testUser.getEmail());
-        loginPage.waitForPasswordField().sendKeys(testUser.getPassword());
-        loginPage.waitForSubmitButton().click();
+        loginPage.login(testUser.getEmail(), testUser.getPassword());
 
         // проверка изменения состояния кнопки
-        WebElement orderButton = homePage.waitForOrderButton();
-        assertTrue("Кнопка оформления заказа не отображается",
-                orderButton.isDisplayed());
-        assertEquals("Неверный текст кнопки после авторизации",
-                "Оформить заказ", orderButton.getText());
+        homePage.verifyOrderButtonVisible();
     }
 
     @Test
     @Story("Альтернативные пути")
-    @Step("Вход через личный кабинет")
+    @DisplayName("Вход через личный кабинет")
+    @Description("Проверка авторизации пользователя через кнопку 'Личный Кабинет'")
     public void testLoginViaPersonalAccount() {
         HomePageLocators homePage = new HomePageLocators(driver);
         LoginPageLocators loginPage = new LoginPageLocators(driver);
 
         // исходное состояние - кнопка "личный кабинет"
-        assertTrue("Главная страница не загружена", homePage.isMainPageDisplayed(url));
-        WebElement personalAccountButton = homePage.waitForPersonalAccountButton();
+        homePage.verifyPersonalAccountButtonVisible();
 
         // переход на страницу авторизации
-        personalAccountButton.click();
-        assertTrue("Не произошел переход на страницу авторизации",
-                loginPage.isPageOpened());
+        homePage.clickPersonalAccountButton();
 
         // заполнение данных и отправка формы
-        loginPage.waitForEmailField().sendKeys(testUser.getEmail());
-        loginPage.waitForPasswordField().sendKeys(testUser.getPassword());
-        loginPage.waitForSubmitButton().click();
+        loginPage.login(testUser.getEmail(), testUser.getPassword());
 
         // проверка изменения состояния кнопки
-        WebElement orderButton = homePage.waitForOrderButton();
-        assertTrue("Кнопка оформления заказа не отображается",
-                orderButton.isDisplayed());
-        assertEquals("Неверный текст кнопки после авторизации",
-                "Оформить заказ", orderButton.getText());
+        homePage.verifyOrderButtonVisible();
     }
 
     @Test
     @Story("Альтернативные пути")
-    @Step("Вход через кнопку в форме регистрации")
+    @DisplayName("Вход через кнопку в форме регистрации")
+    @Description("Проверка авторизации пользователя через кнопку в форме регистрации")
     public void testLoginViaRegistrationForm() {
         HomePageLocators homePage = new HomePageLocators(driver);
         LoginPageLocators loginPage = new LoginPageLocators(driver);
         RegistrationPageLocators registrationPage = new RegistrationPageLocators(driver);
 
         // переход на страницу авторизации через главную кнопку
-        homePage.waitForLoginButton().click();
+        homePage.verifyLoginButtonVisible();
+        homePage.clickLoginButton();
 
         // переход к форме регистрации
-        loginPage.waitForRegistrationButton().click();
+        loginPage.clickRegistrationButton();
 
         // возврат на форму авторизации через кнопку "Войти"
-        registrationPage.waitForLoginLink().click();
+        registrationPage.clickLoginButton();
 
         // заполнение данных и авторизация
-        loginPage.waitForEmailField().sendKeys(testUser.getEmail());
-        loginPage.waitForPasswordField().sendKeys(testUser.getPassword());
-        loginPage.waitForSubmitButton().click();
+        loginPage.login(testUser.getEmail(), testUser.getPassword());
 
         // проверка успешной авторизации через главную страницу
-        WebElement orderButton = homePage.waitForOrderButton();
-        assertTrue("Кнопка 'Оформить заказ' не отображается", orderButton.isDisplayed());
-        assertEquals("Неверный текст кнопки после авторизации",
-                "Оформить заказ", orderButton.getText());
+        homePage.verifyOrderButtonVisible();
     }
 
     @Test
     @Story("Альтернативные пути")
-    @Step("Вход через кнопку в форме восстановления пароля")
+    @DisplayName("Вход через кнопку в форме восстановления пароля")
+    @Description("Проверка авторизации пользователя через кнопку в форме восстановления пароля")
     public void testLoginViaRecoverPasswordForm() {
         HomePageLocators homePage = new HomePageLocators(driver);
         LoginPageLocators loginPage = new LoginPageLocators(driver);
-        RegistrationPageLocators registrationPage = new RegistrationPageLocators(driver);
         ForgotPasswordPageLocators forgotPasswordPage = new ForgotPasswordPageLocators(driver);
 
+        homePage.verifyLoginButtonVisible();
+
         // переход на страницу авторизации через главную кнопку
-        homePage.waitForLoginButton().click();
+        homePage.clickLoginButton();
 
         // переход к форме восстановления пароля
-        loginPage.waitForRecoverButton().click();
+        loginPage.clickRecoverButton();
 
         // возврат на форму авторизации через кнопку "Войти"
-        forgotPasswordPage.waitForLoginLink().click();
+        forgotPasswordPage.clickLoginButton();
 
         // заполнение данных и авторизация
-        loginPage.waitForEmailField().sendKeys(testUser.getEmail());
-        loginPage.waitForPasswordField().sendKeys(testUser.getPassword());
-        loginPage.waitForSubmitButton().click();
+        loginPage.login(testUser.getEmail(), testUser.getPassword());
 
         // проверка успешной авторизации через главную страницу
-        WebElement orderButton = homePage.waitForOrderButton();
-        assertTrue("Кнопка 'Оформить заказ' не отображается", orderButton.isDisplayed());
-        assertEquals("Неверный текст кнопки после авторизации",
-                "Оформить заказ", orderButton.getText());
+        homePage.verifyOrderButtonVisible();
     }
 }
